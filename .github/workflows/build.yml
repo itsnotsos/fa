@@ -64,6 +64,9 @@ jobs:
           set -e
           NEW_VERSION=${{ steps.check_release.outputs.latest_version }}
           
+          # Ensure working directory is owned by builder
+          chown -R builder:builder "$GITHUB_WORKSPACE"
+          
           # Update PKGBUILD
           sed -i "s/pkgver=.*/pkgver=$NEW_VERSION/" PKGBUILD
           sed -i "s/pkgrel=.*/pkgrel=1/" PKGBUILD
@@ -75,8 +78,15 @@ jobs:
           CHECKSUM=$(sha256sum "fagram-${NEW_VERSION}.tar.gz" | awk '{print $1}')
           sed -i "s/sha256sums=('.*')/sha256sums=('$CHECKSUM')/" PKGBUILD
           
-          # Generate .SRCINFO as non-root user
-          sudo -u builder bash -c "cd \"$PWD\" && makepkg --printsrcinfo > .SRCINFO"
+          # Debug: Check permissions before generating .SRCINFO
+          ls -ld "$PWD"
+          whoami
+          
+          # Generate .SRCINFO as non-root user in the current directory
+          sudo -u builder bash -c "cd \"$PWD\" && makepkg --printsrcinfo > .SRCINFO" || { echo "Failed to generate .SRCINFO"; exit 1; }
+          
+          # Debug: Verify .SRCINFO was created
+          ls -l .SRCINFO
           
           # Clone AUR repository
           git clone ssh://aur@aur.archlinux.org/fagram-bin.git aur-repo || { echo "Clone failed"; exit 1; }
