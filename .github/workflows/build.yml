@@ -1,0 +1,92 @@
+name: Update AUR
+
+on:
+  repository_dispatch:
+    types: [update-aur]
+  workflow_dispatch:
+
+jobs:
+  update-package:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    steps:
+      - name: Install base dependencies
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm base-devel git openssh jq curl
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup SSH
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.AUR_KNOWN_HOSTS }}
+          if_key_exists: replace
+
+      - name: Check for new release
+        id: check_release
+        run: |
+          # Get latest release version from GitHub API
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/fagram/fagram/releases/latest | jq -r .tag_name)
+          echo "Latest version: $LATEST_VERSION"
+          
+          # Extract current version from PKGBUILD
+          CURRENT_VERSION=$(grep -oP 'pkgver=\K.*' PKGBUILD | tr -d '"')
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Compare versions
+          if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "update_needed=true" >> $GITHUB_OUTPUT
+            echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "update_needed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update package
+        if: steps.check_release.outputs.update_needed == 'true'
+        run: |
+          NEW_VERSION=${{ steps.check_release.outputs.latest_version }}
+          
+          # Update PKGBUILD
+          sed -i "s/pkgver=.*/pkgver=$NEW_VERSION/" PKGBUILD
+          sed -i "s/pkgrel=.*/pkgrel=1/" PKGBUILD
+          
+          # Download source to calculate SHA256
+          rm -rf pkg src *.tar.gz
+          TAR_URL="https://github.com/fagram/fagram/releases/download/${NEW_VERSION}/fagram-${NEW_VERSION}.tar.gz"
+          curl -L "$TAR_URL" -o "fagram-${NEW_VERSION}.tar.gz"
+          
+          # Calculate checksum
+          CHECKSUM=$(sha256sum "fagram-${NEW_VERSION}.tar.gz" | awk '{print $1}')
+          sed -i "s/sha256sums=('.*')/sha256sums=('$CHECKSUM')/" PKGBUILD
+          
+          # Generate .SRCINFO
+          makepkg --printsrcinfo > .SRCINFO
+          
+          # Commit changes
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add PKGBUILD .SRCINFO
+          git commit -m "Update to $NEW_VERSION"
+          
+      - name: Push to AUR
+        if: steps.check_release.outputs.update_needed == 'true'
+        run: |
+          # Clone the AUR repository
+          git clone ssh://aur@aur.archlinux.org/fagram-bin.git aur-repo
+          
+          # Copy updated files
+          cp PKGBUILD .SRCINFO aur-repo/
+          
+          # Push to AUR
+          cd aur-repo
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add PKGBUILD .SRCINFO
+          git commit -m "Update to ${{ steps.check_release.outputs.latest_version }}"
+          git push
