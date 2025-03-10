@@ -2,7 +2,7 @@
 pkgname=fagram-bin
 pkgver=v4.20.2
 pkgrel=1
-pkgdesc="Telegram Desktop based messenger with Feature-rich modifications - Binary Version"
+pkgdesc="Telegram Desktop based messenger with Feature-rich modifications."
 arch=(x86_64)
 url="https://github.com/FajoX1/fagramdesktop"
 license=(GPL3)
@@ -18,7 +18,7 @@ conflicts=('fagram')
 
 source=("https://github.com/burhancodes/fagram-rpm/releases/download/${pkgver}/fagram-${pkgver}.tar.gz")
 
-sha256sums=('SKIP') # Replace with actual SHA256 sum after downloading the file
+sha256sums=('SKIP')
 
 package() {
     cd "$srcdir/"
