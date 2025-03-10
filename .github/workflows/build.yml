@@ -30,7 +30,7 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -97,3 +97,9 @@ jobs:
           git add PKGBUILD .SRCINFO
           git commit -m "Update to $NEW_VERSION"
           git push || { echo "Push to AUR failed"; exit 1; }
+
+          # Return to main directory
+          cd ..
+          git add PKGBUILD .SRCINFO
+          git commit -m "Update to $NEW_VERSION (pkgrel=$NEW_PKGREL)"
+          git push https://${{ secrets.PAT }}@github.com/burhancodes/fagram-bin.git HEAD:main

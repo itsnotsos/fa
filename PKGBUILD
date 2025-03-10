@@ -1,4 +1,4 @@
-# Maintainer: omansh-krishn <omanshkrishn@duck.com>
+# Maintainer: Burhanverse <contact@burhanverse.eu.org>
 pkgname=fagram-bin
 pkgver=v4.20.2
 pkgrel=1
