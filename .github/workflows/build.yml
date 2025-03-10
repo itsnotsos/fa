@@ -90,8 +90,10 @@ jobs:
           
           # Initialize git repository and commit changes
           git init
+          git config --global --add safe.directory /__w/fagram-bin/fagram-bin
           git add PKGBUILD .SRCINFO
           git commit -m "Update to $NEW_VERSION"
+          git push
           
       - name: Push to AUR
         if: steps.check_release.outputs.update_needed == 'true'
@@ -104,6 +106,7 @@ jobs:
           
           # Push to AUR
           cd aur-repo
+          git config --global --add safe.directory /__w/fagram-bin/fagram-bin/aur-repo
           git add PKGBUILD .SRCINFO
           git commit -m "Update to ${{ steps.check_release.outputs.latest_version }}"
           git push
