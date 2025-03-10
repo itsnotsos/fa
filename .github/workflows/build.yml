@@ -69,7 +69,7 @@ jobs:
           
           # Update PKGBUILD
           sed -i "s/pkgver=.*/pkgver=$NEW_VERSION/" PKGBUILD
-          sed -i "s/pkgrel=.*/pkgrel=1/" PKGBUILD
+          sed -i "s/pkgrel=.*/pkgrel=2/" PKGBUILD
           
           # Download source and calculate SHA256
           rm -rf pkg src *.tar.gz
@@ -97,9 +97,3 @@ jobs:
           git add PKGBUILD .SRCINFO
           git commit -m "Update to $NEW_VERSION"
           git push || { echo "Push to AUR failed"; exit 1; }
-
-          # Return to main directory
-          cd ..
-          git add PKGBUILD .SRCINFO
-          git commit -m "Update to $NEW_VERSION (pkgrel=$NEW_PKGREL)"
-          git push https://${{ secrets.PAT }}@github.com/burhancodes/fagram-bin.git HEAD:main
