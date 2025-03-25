@@ -1,6 +1,6 @@
 # Maintainer: Burhanverse <contact@burhanverse.eu.org>
 pkgname=fagram-bin
-pkgver=v4.20.2
+pkgver=4.20.2
 pkgrel=1
 pkgdesc="Telegram Desktop based messenger with Feature-rich modifications."
 arch=(x86_64)
@@ -16,7 +16,7 @@ optdepends=('webkit2gtk: embedded browser features'
 provides=('fagram')
 conflicts=('fagram')
 
-source=("https://github.com/burhancodes/fagram-rpm/releases/download/${pkgver}/fagram-${pkgver}.tar.gz")
+source=("https://github.com/burhancodes/fagram-rpm/releases/download/v${pkgver}/fagram-v${pkgver}.tar.gz")
 
 sha256sums=('SKIP')
 

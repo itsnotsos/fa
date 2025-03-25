@@ -45,8 +45,12 @@ jobs:
         id: check_release
         run: |
           set -e
-          LATEST_VERSION=$(curl -s https://api.github.com/repos/FajoX1/fagramdesktop/releases/latest | jq -r .tag_name)
-          echo "Latest version: $LATEST_VERSION"
+          LATEST_TAG=$(curl -s https://api.github.com/repos/FajoX1/fagramdesktop/releases/latest | jq -r .tag_name)
+          echo "Latest tag: $LATEST_TAG"
+          
+          # Strip the 'v' prefix for version comparison
+          LATEST_VERSION=${LATEST_TAG#v}
+          echo "Latest version (without v): $LATEST_VERSION"
           
           CURRENT_VERSION=$(grep -oP 'pkgver=\K.*' PKGBUILD | tr -d '"')
           echo "Current version: $CURRENT_VERSION"
@@ -54,6 +58,7 @@ jobs:
           if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
             echo "update_needed=true" >> $GITHUB_OUTPUT
             echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+            echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
           else
             echo "update_needed=false" >> $GITHUB_OUTPUT
           fi
@@ -63,19 +68,20 @@ jobs:
         run: |
           set -e
           NEW_VERSION=${{ steps.check_release.outputs.latest_version }}
+          TAG_VERSION=${{ steps.check_release.outputs.latest_tag }}
           
           # Ensure working directory is owned by builder
           chown -R builder:builder "$GITHUB_WORKSPACE"
           
-          # Update PKGBUILD
+          # Update PKGBUILD with version without 'v' prefix
           sed -i "s/pkgver=.*/pkgver=$NEW_VERSION/" PKGBUILD
           sed -i "s/pkgrel=.*/pkgrel=1/" PKGBUILD
           
           # Download source and calculate SHA256
           rm -rf pkg src *.tar.gz
-          TAR_URL="https://github.com/burhancodes/fagram-rpm/releases/download/${NEW_VERSION}/fagram-${NEW_VERSION}.tar.gz"
-          curl -L "$TAR_URL" -o "fagram-${NEW_VERSION}.tar.gz" || { echo "Download failed"; exit 1; }
-          CHECKSUM=$(sha256sum "fagram-${NEW_VERSION}.tar.gz" | awk '{print $1}')
+          TAR_URL="https://github.com/burhancodes/fagram-rpm/releases/download/${TAG_VERSION}/fagram-${TAG_VERSION}.tar.gz"
+          curl -L "$TAR_URL" -o "fagram-${TAG_VERSION}.tar.gz" || { echo "Download failed"; exit 1; }
+          CHECKSUM=$(sha256sum "fagram-${TAG_VERSION}.tar.gz" | awk '{print $1}')
           sed -i "s/sha256sums=('.*')/sha256sums=('$CHECKSUM')/" PKGBUILD
           
           # Debug: Check permissions before generating .SRCINFO
