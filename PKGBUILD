@@ -1,7 +1,7 @@
 # Maintainer: Burhanverse <contact@burhanverse.eu.org>
 pkgname=fagram-bin
-pkgver=4.20.2
-pkgrel=1
+pkgver=1.1.7
+pkgrel=3
 pkgdesc="Telegram Desktop based messenger with Feature-rich modifications."
 arch=(x86_64)
 url="https://github.com/FajoX1/fagramdesktop"
