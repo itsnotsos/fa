@@ -33,6 +33,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
 #      - name: Setup SSH
 #        uses: shimataro/ssh-key-action@v2
@@ -90,4 +91,4 @@ jobs:
           # Commit changes to main repository
           git add PKGBUILD .SRCINFO
           git commit -m "Update PKGBUILD and .SRCINFO to $NEW_VERSION"
-          git push || { echo "Push to GitHub failed"; exit 1; }
+          git push origin main
