@@ -30,7 +30,7 @@ jobs:
 
       - name: Clone the repository manually
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Or use a PAT: ${{ secrets.PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
           git clone https://x-access-token:$GITHUB_TOKEN@github.com/itsnotsos/fa.git workdir
           cd workdir
