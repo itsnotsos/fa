@@ -34,12 +34,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup SSH
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-          known_hosts: ${{ secrets.AUR_KNOWN_HOSTS }}
-          if_key_exists: replace
+#      - name: Setup SSH
+#        uses: shimataro/ssh-key-action@v2
+#        with:
+#          key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+#          known_hosts: ${{ secrets.AUR_KNOWN_HOSTS }}
+#          if_key_exists: replace
 
       - name: Check for new release
         id: check_release
@@ -95,7 +95,7 @@ jobs:
           cd aur-repo
           git add PKGBUILD .SRCINFO
           git commit -m "Update to $NEW_VERSION"
-          git push || { echo "Push to AUR failed"; exit 1; }
+          git push
           
           # Return to working directory and clean up
           cd ..
