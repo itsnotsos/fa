@@ -84,15 +84,8 @@ jobs:
           CHECKSUM=$(sha256sum "fagram-${TAG_VERSION}.tar.gz" | awk '{print $1}')
           sed -i "s/sha256sums=('.*')/sha256sums=('$CHECKSUM')/" PKGBUILD
           
-          # Debug: Check permissions before generating .SRCINFO
-          ls -ld "$PWD"
-          whoami
-          
           # Generate .SRCINFO as non-root user in the current directory
           sudo -u builder bash -c "cd \"$PWD\" && makepkg --printsrcinfo > .SRCINFO" || { echo "Failed to generate .SRCINFO"; exit 1; }
-          
-          # Debug: Verify .SRCINFO was created
-          ls -l .SRCINFO
           
           # Clone AUR repository
           git clone ssh://aur@aur.archlinux.org/fagram-bin.git aur-repo || { echo "Clone failed"; exit 1; }
@@ -103,3 +96,12 @@ jobs:
           git add PKGBUILD .SRCINFO
           git commit -m "Update to $NEW_VERSION"
           git push || { echo "Push to AUR failed"; exit 1; }
+          
+          # Return to working directory and clean up
+          cd ..
+          rm -rf aur-repo
+          
+          # Commit changes to main repository
+          git add PKGBUILD .SRCINFO
+          git commit -m "Update PKGBUILD and .SRCINFO to $NEW_VERSION"
+          git push || { echo "Push to GitHub failed"; exit 1; }
