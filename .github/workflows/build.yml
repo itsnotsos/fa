@@ -27,15 +27,16 @@ jobs:
         run: |
           git config --global user.email "contact@burhanverse.eu.org"
           git config --global user.name "Burhanverse"
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Clone the repository manually
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Or use a PAT: ${{ secrets.PAT_TOKEN }}
+        run: |
+          git clone https://x-access-token:$GITHUB_TOKEN@github.com/itsnotsos/fa.git workdir
+          cd workdir
+          git checkout main  # Adjust if your default branch is different (e.g., master)
 
-#      - name: Setup SSH
+#      - name: Setup SSH for AUR
 #        uses: shimataro/ssh-key-action@v2
 #        with:
 #          key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
@@ -44,6 +45,7 @@ jobs:
 
       - name: Check for new release
         id: check_release
+        working-directory: ./workdir
         run: |
           set -e
           LATEST_TAG=$(curl -s https://api.github.com/repos/FajoX1/fagramdesktop/releases/latest | jq -r .tag_name)
@@ -64,15 +66,18 @@ jobs:
             echo "update_needed=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Update package and push to AUR
+      - name: Update package and push to AUR and GitHub
         if: steps.check_release.outputs.update_needed == 'true'
+        working-directory: ./workdir
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
           set -e
           NEW_VERSION=${{ steps.check_release.outputs.latest_version }}
           TAG_VERSION=${{ steps.check_release.outputs.latest_tag }}
           
           # Ensure working directory is owned by builder
-          chown -R builder:builder "$GITHUB_WORKSPACE"
+          chown -R builder:builder .
           
           # Update PKGBUILD with version without 'v' prefix
           sed -i "s/pkgver=.*/pkgver=$NEW_VERSION/" PKGBUILD
@@ -87,8 +92,7 @@ jobs:
           
           # Generate .SRCINFO as non-root user in the current directory
           sudo -u builder bash -c "cd \"$PWD\" && makepkg --printsrcinfo > .SRCINFO" || { echo "Failed to generate .SRCINFO"; exit 1; }
-          
           # Commit changes to main repository
           git add PKGBUILD .SRCINFO
           git commit -m "Update PKGBUILD and .SRCINFO to $NEW_VERSION"
-          git push origin main
+          git push https://x-access-token:$GITHUB_TOKEN@github.com/itsnotsos/fa.git main || { echo "Push to GitHub failed"; exit 1; }
