@@ -27,6 +27,7 @@ jobs:
         run: |
           git config --global user.email "contact@burhanverse.eu.org"
           git config --global user.name "Burhanverse"
+          git config --global --add safe.directory /__w/fa/fa/workdir
 
       - name: Clone the repository manually
         env:
