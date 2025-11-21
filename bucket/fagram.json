@@ -4,11 +4,11 @@
     "homepage": "https://github.com/bruhancodes/fagramdesktop",
     "license": {
         "identifier": "Freeware",
-        "url": "https://github.com/bruhancodes/fagramdesktop/blob/dev/LICENSE"
+        "url": "https://github.com/burhancodes/fagramdesktop/blob/dev/LICENSE"
     },
     "architecture": {
         "64bit": {
-            "url": "https://github.com/bruhancodes/fagramdesktop/releases/download/2.0.1/FAgram_x64_2.0.1_portable.zip",
+            "url": "https://github.com/burhancodes/fagramdesktop/releases/download/2.0.1/FAgram_x64_2.0.1_portable.zip",
             "hash": "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5"
         }
     },
