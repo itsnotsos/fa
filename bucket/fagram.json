@@ -1,7 +1,7 @@
 {
     "version": "2.0.1",
     "description": "FAgram is a 3rd party Telegram client.",
-    "homepage": "https://github.com/bruhancodes/fagramdesktop",
+    "homepage": "https://github.com/burhancodes/fagramdesktop",
     "license": {
         "identifier": "Freeware",
         "url": "https://github.com/burhancodes/fagramdesktop/blob/dev/LICENSE"
