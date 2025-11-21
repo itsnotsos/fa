@@ -1,0 +1,33 @@
+{
+    "version": "2.0.1",
+    "description": "FAgram is a 3rd party Telegram client.",
+    "homepage": "https://github.com/bruhancodes/fagramdesktop",
+    "license": {
+        "identifier": "Freeware",
+        "url": "https://github.com/bruhancodes/fagramdesktop/blob/dev/LICENSE"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/bruhancodes/fagramdesktop/releases/download/2.0.1/FAgram_x64_2.0.1_portable.zip",
+            "hash": "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5"
+        }
+    },
+    "shortcuts": [
+        [
+            "fagram.exe",
+            "FAgram"
+        ]
+    ],
+    "persist": "tdata",
+    "checkver": {
+        "url": "https://github.com/burhancodes/fagramdesktop",
+        "regex": "/releases/tag/([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/burhancodes/fagramdesktop/releases/download/$version/FAgram_x64_$version_portable.zip"
+            }
+        }
+    }
+}
