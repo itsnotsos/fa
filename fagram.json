@@ -1,6 +1,6 @@
 {
     "version": "2.0.1",
-    "description": "FAgram is a 3rd party Telegram client.",
+    "description": "FAgram Desktop is a custom Telegram client.",
     "homepage": "https://github.com/burhancodes/fagramdesktop",
     "license": {
         "identifier": "Freeware",
@@ -26,7 +26,7 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/burhancodes/fagramdesktop/releases/download/$version/FAgram_x64_$version_portable.zip"
+                "url": "https://github.com/burhancodes/fagramdesktop/releases/download/$version/FAgram_x64_${version}_portable.zip"
             }
         }
     }
